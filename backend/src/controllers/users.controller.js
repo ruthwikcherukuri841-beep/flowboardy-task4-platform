@@ -5,6 +5,7 @@ import { Task } from "../models/Task.js";
 import { Team } from "../models/Team.js";
 import { User } from "../models/User.js";
 import { ApiError, asyncHandler, ok } from "../utils/http.js";
+import { normalizeUsername } from "../utils/userMeta.js";
 
 const initials = (name) => name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
 
@@ -15,6 +16,8 @@ export const listUsers = asyncHandler(async (req, res) => {
     ? { $or: [
         { name: { $regex: esc, $options: "i" } },
         { email: { $regex: esc, $options: "i" } },
+        { username: { $regex: esc, $options: "i" } }, // "@handle"
+        { uid: { $regex: esc, $options: "i" } }, // "FB-7KQ2XM"
         { role: { $regex: esc, $options: "i" } },
         { location: { $regex: esc, $options: "i" } },
       ] }
@@ -29,14 +32,12 @@ export const getUser = asyncHandler(async (req, res) => {
 });
 
 export const createUser = asyncHandler(async (req, res) => {
-  const exists = await User.findOne({ email: req.body.email.toLowerCase() });
-  if (exists) throw ApiError.conflict("Email is already registered");
   const user = await User.create({
     name: req.body.name,
     email: req.body.email.toLowerCase(),
     passwordHash: await bcrypt.hash(req.body.password, 10),
     role: req.body.role,
-    avatar: initials(req.body.name),
+    avatar: initials(req.body.name)
   });
   return ok(res, user, 201);
 });
