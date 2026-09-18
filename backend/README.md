@@ -55,7 +55,7 @@ Passwords are bcrypt-hashed; hashes never leave the server. Tokens are JWT (7-da
 | GET | `/api/users?search=` | member directory (search by name / email / role / location). **Public-facing list for the workspace** — returns `id, name, email, role, location, bio, avatar` |
 | GET | `/api/users/:id` | one profile |
 | PUT | `/api/users/:id` | partial `{ name?, email?, role?, location?, bio? }` (only your own profile) |
-| DELETE | `/api/users/:id` | delete your own account |
+| DELETE | `/api/users/:id` | delete your own account (cascades: your chat, teams, memberships, shares, task assignments) |
 
 ## Projects
 

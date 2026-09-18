@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { MessageSquare, Plus, Search, Send, Timer, Trash2 } from "lucide-react";
 import { api } from "../lib/api";
 import type { ChatContact, ChatMessage, User } from "../types";
@@ -9,6 +9,20 @@ function fmtTime(iso?: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
   return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+function dayLabel(iso?: string): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+  const sameDay = (a: Date, b: Date) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  if (sameDay(d, today)) return "Today";
+  if (sameDay(d, yesterday)) return "Yesterday";
+  const year = d.getFullYear() !== today.getFullYear() ? { year: "numeric" as const } : {};
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric", ...year });
 }
 
 export function ChatPage({
@@ -240,15 +254,24 @@ export function ChatPage({
                   <p className="max-w-xs text-xs text-slate-400">Say hi, share updates, or send work for review. Messages delete themselves after 24 hours.</p>
                 </div>
               ) : (
-                messages.map((m) => {
+                messages.map((m, i) => {
                   const mine = m.from === me;
+                  const prev = i > 0 ? messages[i - 1] : null;
+                  const showDay = !prev || dayLabel(prev.createdAt) !== dayLabel(m.createdAt);
                   return (
-                    <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-                      <div className={`max-w-[78%] rounded-2xl px-3.5 py-2 ${mine ? "rounded-br-md bg-indigo-600 text-white" : "rounded-bl-md border border-slate-200 bg-white text-slate-800"}`}>
-                        <p className="whitespace-pre-wrap break-words text-[13px] leading-relaxed">{m.text}</p>
-                        <p className={`mt-0.5 text-right text-[10px] ${mine ? "text-indigo-200" : "text-slate-400"}`}>{fmtTime(m.createdAt)}{mine && m.seen ? " · ✓✓" : ""}</p>
+                    <Fragment key={m.id}>
+                      {showDay && (
+                        <div className="flex justify-center py-0.5">
+                          <span className="rounded-full bg-slate-200/80 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-500">{dayLabel(m.createdAt)}</span>
+                        </div>
+                      )}
+                      <div className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+                        <div className={`max-w-[78%] rounded-2xl px-3.5 py-2 ${mine ? "rounded-br-md bg-indigo-600 text-white" : "rounded-bl-md border border-slate-200 bg-white text-slate-800"}`}>
+                          <p className="whitespace-pre-wrap break-words text-[13px] leading-relaxed">{m.text}</p>
+                          <p className={`mt-0.5 text-right text-[10px] ${mine ? "text-indigo-200" : "text-slate-400"}`}>{fmtTime(m.createdAt)}{mine && m.seen ? " · ✓✓" : ""}</p>
+                        </div>
                       </div>
-                    </div>
+                    </Fragment>
                   );
                 })
               )}
@@ -261,15 +284,19 @@ export function ChatPage({
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void send(); } }}
                 rows={2}
+                maxLength={2000}
                 placeholder={`Message ${activeUser.name.split(" ")[0]}…`}
                 className="min-h-[44px] flex-1 resize-none rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-[13px] outline-none placeholder:text-slate-400 focus:border-indigo-400"
                 aria-label="Message"
               />
-              <button type="submit" disabled={!draft.trim() || sending}
-                className="inline-flex h-[44px] items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 text-[13px] font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-40">
-                {sending ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" /> : <Send size={15} />}
-                <span className="hidden sm:inline">Send</span>
-              </button>
+              <div className="flex shrink-0 flex-col items-end gap-1.5">
+                <span className="text-[10px] font-medium tabular-nums text-slate-400">{draft.length}/2000</span>
+                <button type="submit" disabled={!draft.trim() || sending}
+                  className="inline-flex h-[44px] items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 text-[13px] font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-40">
+                  {sending ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" /> : <Send size={15} />}
+                  <span className="hidden sm:inline">Send</span>
+                </button>
+              </div>
             </form>
           </div>
         ) : (

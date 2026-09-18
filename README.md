@@ -209,6 +209,7 @@ Inspect the **live** indexes any time — `GET /api/system/storage` reports each
 ### Cascades & cleanup
 
 - Deleting a project deletes its tasks (`Task.deleteMany({ projectId })`) in the same request.
+- Deleting your account cleans up everywhere you were referenced: assigned tasks, project members/sharing lists, teams you created, memberships, and both sides of any chat.
 - Chat messages self-expire after 24 hours thanks to the TTL index — no cron, no manual cleanup.
 
 ### Persistence guarantees

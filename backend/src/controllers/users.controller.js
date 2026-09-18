@@ -1,6 +1,8 @@
 import bcrypt from "bcryptjs";
+import { ChatMessage } from "../models/ChatMessage.js";
 import { Project } from "../models/Project.js";
 import { Task } from "../models/Task.js";
+import { Team } from "../models/Team.js";
 import { User } from "../models/User.js";
 import { ApiError, asyncHandler, ok } from "../utils/http.js";
 
@@ -64,8 +66,16 @@ export const deleteUser = asyncHandler(async (req, res) => {
   if (req.params.id !== req.userId) throw new ApiError(403, "You can only delete your own account");
   const user = await User.findById(req.params.id);
   if (!user) throw ApiError.notFound("User not found");
+  // Cascade: remove the member everywhere they were referenced — tasks they
+  // were assigned, project member/sharing lists, teams they created (and any
+  // team they belonged to), and every chat message they were part of
+  // (otherwise those linger until the 24h TTL).
+  await ChatMessage.deleteMany({ $or: [{ from: user.id }, { to: user.id }] });
   await user.deleteOne();
   await Task.updateMany({ assignee: user.id }, { $unset: { assignee: "" } });
   await Project.updateMany({ members: user.id }, { $pull: { members: user.id } });
+  await Project.updateMany({ sharedWith: { $elemMatch: { user: user.id } } }, { $pull: { sharedWith: { user: user.id } } });
+  await Team.deleteMany({ createdBy: user.id });
+  await Team.updateMany({ memberIds: user.id }, { $pull: { memberIds: user.id } });
   return ok(res, user);
 });
