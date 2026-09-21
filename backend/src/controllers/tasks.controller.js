@@ -59,6 +59,15 @@ export const getTask = asyncHandler(async (req, res) => {
 });
 
 export const createTask = asyncHandler(async (req, res) => {
+  const { projectId, title: rawTitle } = req.body;
+  const title = typeof rawTitle === "string" ? rawTitle.trim() : "";
+  if (title) {
+    const dupTitle = await Task.findOne({
+      projectId,
+      title: { $regex: `^${title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, $options: "i" },
+    });
+    if (dupTitle) return fail(res, 409, "A task with this name already exists in this project");
+  }
   const access = await projectAccess(req.userId, req.body.projectId);
   if (access !== "owner") throw ApiError.forbidden("Only the project owner can add tasks");
   if (req.body.assignee && !(await User.exists({ _id: req.body.assignee }))) {
