@@ -1,6 +1,6 @@
 # FlowBoard — Projects & Tasks (Live API Edition)
 
-Live demo: **https://flowboardys.vercel.app** · API: **https://flowboardy-api.vercel.app/health**
+Live demo: **https://flowboardys.vercel.app** · API: **https://flowboardy-api.vercel.app/api**
 
 FlowBoard is a calm, fast workspace for tracking projects and tasks. One overview for standup, one board for projects, one list for tasks — with search, filters, notifications, profiles, and display preferences built in.
 

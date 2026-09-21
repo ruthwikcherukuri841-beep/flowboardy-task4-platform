@@ -93,7 +93,7 @@ export const api = {
     request<Task>("/tasks", { method: "POST", body: JSON.stringify(d) }),
   updateTask: (id: string, d: Partial<Task>) =>
     request<Task>(`/tasks/${id}`, { method: "PUT", body: JSON.stringify(d) }),
-  updateUser: (id: string, d: { name?: string; email?: string; role?: string; bio?: string; location?: string }) =>
+  updateUser: (id: string, d: { name?: string; email?: string; role?: string; bio?: string; location?: string; username?: string }) =>
     request<User>(`/users/${id}`, { method: "PUT", body: JSON.stringify(d) }),
   updateAvatar: (dataUrl: string) =>
     request<{ url: string; deleteUrl: string; user: User }>("/uploads/avatar", { method: "POST", body: JSON.stringify({ image: dataUrl }) }),

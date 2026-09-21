@@ -5,6 +5,8 @@ export type ProjectAccess = "view" | "review" | "edit";
 
 export interface User {
   id: string;
+  uid?: string; // short public id, "FB-7KQ2XM"
+  username?: string; // @handle
   name: string;
   email: string;
   avatar: string;

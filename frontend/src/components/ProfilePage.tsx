@@ -109,13 +109,12 @@ export function ProfilePage({
       {/* Public view of another member: only info that belongs to them is shown. */}
       {!self ? (
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.05)]">
-          <div className="hero-animated h-24" style={{ background: `linear-gradient(135deg, ${solid}, ${solid}99, ${solid})` }} />
           <div className="px-4 pb-4 sm:px-6 sm:pb-5">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div className="flex items-end gap-3.5">
-                <span className="flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-2xl border-4 border-white shadow-md" style={{ transform: "translateY(-18px)" }}>
-                  <Avatar avatar={avatar} name={name} className="h-full w-full rounded-2xl text-xl font-extrabold" />
-                </span>
+<span className="flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-full border-4 border-white shadow-md" style={{ transform: "translateY(-18px)" }}>
+  <Avatar avatar={avatar} name={name} className="h-full w-full rounded-full text-xl font-extrabold" />
+</span>
                 <div className="pb-1">
                   <h1 className="flex items-center gap-1.5 text-lg font-bold tracking-tight text-slate-900">
                     {name}
@@ -151,13 +150,12 @@ export function ProfilePage({
         <>
       {/* Own profile */}
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(16,24,40,0.05)]">
-        <div className="hero-animated h-24" style={{ background: `linear-gradient(135deg, ${solid}, ${solid}99, ${solid})` }} />
         <div className="px-4 pb-4 sm:px-6 sm:pb-5">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div className="flex items-end gap-3.5">
               <div className="relative" style={{ transform: "translateY(-18px)" }}>
-                <span className="flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-2xl border-4 border-white shadow-md">
-                  <Avatar avatar={avatar} name={name} className="h-full w-full rounded-2xl text-xl font-extrabold" />
+                <span className="flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-full border-4 border-white shadow-md">
+                  <Avatar avatar={avatar} name={name} className="h-full w-full rounded-full text-xl font-extrabold" />
                 </span>
                 {onAvatar && (
                   <>
